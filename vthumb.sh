@@ -1,7 +1,24 @@
 #!/bin/bash
 
+# Generate an image mosaic from video frames
+# Requires mediainfo, avconv and Imagemagick suite
+
 if [ $# -lt 1 ]; then
-    echo "Uso: vthumb.sh video"
+    echo "Use: vthumb.sh <video file(s)>"
+    exit 1
+fi
+
+# Check for dependencies
+if ! type mediainfo > /dev/null 2>&1; then
+    mensaje "Comando mediainfo no encontrado. "
+    exit 1
+fi
+if ! type avconv > /dev/null 2>&1; then
+    mensaje "Comando avconv no encontrado. "
+    exit 1
+fi
+if ! type montage > /dev/null 2>&1; then
+    mensaje "Comando montage no encontrado. "
     exit 1
 fi
 
