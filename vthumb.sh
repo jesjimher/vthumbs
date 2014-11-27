@@ -38,11 +38,11 @@ for fichero in "$@"; do
     echo "  Extrayendo fotogramas cada $(echo "scale=2;1/$fps" | bc) segundos..."
     if avconv -v quiet -i "$fichero" -bt 20M -vsync 1 -r $fps -an -y -filter scale=320:-1 $dtemp/'cap%03d.jpg'; then
     	# Montar la imagen con las capturas
-	echo "  Generando mosaico..."
-	fsalida="${fichero%.*}_thumb.jpg"
-	montage $dtemp/cap00[1-9].jpg -mode Concatenate -geometry +5+5 -shadow -tile 3x3 -quality 75 -title "$fichero ($durlegible)" "$fsalida"
+		echo "  Generando mosaico..."
+		fsalida="${fichero%.*}_thumb.jpg"
+		montage $dtemp/cap00[1-9].jpg -mode Concatenate -geometry +5+5 -shadow -tile 3x3 -quality 75 -title "$fichero ($durlegible)" "$fsalida"
     else
-	echo "*** ERROR PROCESANDO $fichero"
+		echo "*** ERROR PROCESANDO $fichero"
     fi
 
     # Eliminar temporales
