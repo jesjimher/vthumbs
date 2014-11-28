@@ -28,14 +28,15 @@ for fichero in "$@"; do
     duracion=$(mediainfo --Inform="Video;%Duration%" "$fichero")
     let duracion=duracion/1000
     durlegible=$(date -u -d @$duracion +"%_Hh%_Mm %_Ss")
+    echo "Procesando $fichero, $durlegible"
+
     # Averiguar si es entrelazado o no
     scantype=`mediainfo "$fichero" | grep -i "scan type" | cut -d: -f2 | sed 's/ //g'`
     entrelazado=
-    if [ ! $scantype -eq "Progressive" ]; then
+    if [ $scantype = "Interlaced" ]; then
+		echo "  Detectado vídeo entrelazado, desentrelazando..."
         entrelazado=1
     fi
-
-    echo "Procesando $fichero, $durlegible"
 
     # Calcular los fps a capturar para obtener 9 frames distribuidos equitativamente por el vídeo
     fps=$(echo "scale=4;8/$duracion" | bc)
