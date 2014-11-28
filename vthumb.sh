@@ -28,6 +28,12 @@ for fichero in "$@"; do
     duracion=$(mediainfo --Inform="Video;%Duration%" "$fichero")
     let duracion=duracion/1000
     durlegible=$(date -u -d @$duracion +"%_Hh%_Mm %_Ss")
+    # Averiguar si es entrelazado o no
+    scantype=`mediainfo "$fichero" | grep -i "scan type" | cut -d: -f2 | sed 's/ //g'`
+    entrelazado=
+    if [ ! $scantype -eq "Progressive" ]; then
+        entrelazado=1
+    fi
 
     echo "Procesando $fichero, $durlegible"
 
@@ -43,7 +49,12 @@ for fichero in "$@"; do
 
     # Extraer fotogramas según los fps calculados, escalando a 320xloquesea:
     echo "  Extrayendo fotogramas cada $(echo "scale=2;1/$fps" | bc) segundos..."
-    if avconv -v quiet -i "$fichero" -bt 20M -vsync 1 -r $fps -an -y -filter scale=320:-1 $dtemp/'cap%03d.jpg'; then
+    filtro=
+    if [ $entrelazado ]; then
+        filtro="yadif=1,"
+    fi
+    filtro="$filtro"scale=320:-1
+    if avconv -v quiet -i "$fichero" -bt 20M -vsync 1 -r $fps -an -y -filter "$filtro" $dtemp/'cap%03d.jpg'; then
     	# Montar la imagen con las capturas
 		echo "  Generando mosaico..."
 		montage $dtemp/cap00[1-9].jpg -mode Concatenate -geometry +5+5 -shadow -tile 3x3 -quality 75 -title "$fichero ($durlegible)" "$fsalida"
